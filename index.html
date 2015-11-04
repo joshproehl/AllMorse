@@ -1,0 +1,146 @@
+<html>
+  <head>
+    <title>Morse-Decoder</title>
+
+    <script type="text/javascript">
+      var morse = {
+        ".-": "a",
+        "-...": "b",
+        "-.-.": "c",
+        "-..": "d",
+        ".": "e",
+        "..-.": "f",
+        "--.": "g",
+        "....": "h",
+        "..": "i",
+        ".---": "j",
+        "-.-": "k",
+        ".-..": "l",
+        "--": "m",
+        "-.": "n",
+        "---": "o",
+        ".--.": "p",
+        "--.-": "q",
+        ".-.": "r",
+        "...": "s",
+        "-": "t",
+        "..-": "u",
+        "...-": "v",
+        ".--": "w",
+        "-..-": "x",
+        "-.--": "y",
+        "--..": "z",
+        ".----": "1",
+        "..---": "2",
+        "...--": "3",
+        "....-": "4",
+        ".....": "5",
+        "-....": "6",
+        "--...": "7",
+        "---..": "8",
+        "----.": "9",
+        "-----": "0",
+        ".-.-.-": ".",
+        "--..--": ",",
+        "..--..": "?",
+        ".----.": "'",
+        "-.-.--": "!",
+        "-..-.": "/",
+        "-.--.": "(",
+        "-.--.-": ")",
+        ".-...": "&",
+        "---...": ":",
+        "-.-.-.": ";",
+        "-...-": "=",
+        ".-.-.": "+",
+        "-....-": "-",
+        "..--.-": "_",
+        ".-..-.": "\"",
+        "...-..-": "$",
+        ".--.-.": "@"
+      }
+      
+      function decodeMorse() {
+        // Get the input value
+        var inputMorse = document.getElementById("morse").value;
+
+        // Sanity check, make sure there are only morse characters.
+        if(/[^\\.\\-]/.test(inputMorse)) {
+          alert("Only use the . or - characters in the input box please...");
+          return;
+        }
+
+        // We're gonig to make a list which will contain every possible result
+        var results = new Array();
+
+        console.log("Parsing: "+inputMorse);
+        // Do the parsing!
+        recursiveParse("", inputMorse, results);
+
+        // Start printing results by updating the result header...
+        document.getElementById("resultInput").innerHTML = "Possible results of "+inputMorse+" are:";
+
+        var resultList = document.getElementById("resultList");
+
+        // Loop through the result list to clean out the <ul> of any previous results
+        while (resultList.firstChild) {
+          resultList.removeChild(resultList.firstChild);
+        }
+
+        // Loop through the results create <li> elements with the result text, adding them to the <ul>
+        for(var i=0; i<results.length; i++) {
+          var li = document.createElement("li");
+          var liText = document.createTextNode(results[i]);
+          li.appendChild(liText);
+          resultList.appendChild(li);
+        }
+      }
+
+
+      function recursiveParse(curParsed, remainingMorse, resArr) {
+        console.log("Starting recursion with "+curParsed+", and remaining morse: "+remainingMorse);
+        // If we get called with no remaining morse, then we reached a valid fully-parsed
+        // string, and so we can add the string to the result array and terminate!
+        if(curParsed.length > 0 && remainingMorse.length == 0)
+        {
+          resArr.push(curParsed);
+          return;
+        }
+
+        // Loop through all possible substrings of the remaining morse code string,
+        // beginning with the single character either . or - which will always parse,
+        // and then including the increasingly longer strings
+        for(var i=1; i<=remainingMorse.length; i++) {
+          var tChar = morse[remainingMorse.slice(0,i)];
+          // If we found a matching character for this substring, add it to the currently parsed, then
+          // continue parsing the remaining morse string minus this character.
+          if(tChar != null) {
+            recursiveParse(curParsed+tChar, remainingMorse.slice(i,remainingMorse.length), resArr);
+          }
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <h1>AllMorse</h1>
+
+    <div>
+      Morse code is unambiguous to decode, at least as long as there are spaces in the right places.<br />
+      But what happens when there aren't? Is <b>.-</b> an "a", or "ET"?<br />
+      Enter code in the box below using . and - characters, and we'll show you all possible translations of the code which make use of every single character entered.
+    </div>
+
+    <div>
+      <input type="text" id="morse" placeholder="" /><br />
+      <input type="button" value="Decode" onClick="decodeMorse();" />
+    </div>
+
+    <h3>Results:</h3>
+    <div>
+      <div id="resultInput"></div>
+      <ul id="resultList">
+
+      </ul>
+    </div>
+  </body>
+</html>
